@@ -1,6 +1,7 @@
 package com.aninfo;
 
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction;
 import com.aninfo.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.Optional;
 import springfox.documentation.builders.PathSelectors;
@@ -75,12 +77,35 @@ public class Memo1BankApp {
 		return accountService.deposit(cbu, sum);
 	}
 
+	@GetMapping("/transactions")
+	public Collection<Transaction> getTransactions() {
+		return accountService.getTransactions();
+	}
+
+	@GetMapping("/transactions/{cbu}/accounts")
+	public ResponseEntity<Collection<Transaction>> getTransactionByCbu(@PathVariable Long cbu) {
+		Optional<Collection<Transaction>> transactionOptional = accountService.findTransactionByCbu(cbu);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+	@GetMapping("/transactions/{number}")
+	public ResponseEntity<Transaction> getTransactionById(@PathVariable Long number) {
+		Optional<Transaction> transactionOptional = accountService.findTransactionById(number);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+	@DeleteMapping("/transactions/{number}")
+	public void deleteTransaction(@PathVariable Long number) {
+		accountService.deleteTransactionById(number);
+	}
+
+
 	@Bean
 	public Docket apiDocket() {
 		return new Docket(DocumentationType.SWAGGER_2)
-			.select()
-			.apis(RequestHandlerSelectors.any())
-			.paths(PathSelectors.any())
-			.build();
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any())
+				.build();
 	}
 }
